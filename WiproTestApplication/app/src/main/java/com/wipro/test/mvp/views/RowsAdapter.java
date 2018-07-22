@@ -1,6 +1,4 @@
 package com.wipro.test.mvp.views;
-
-import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -8,11 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.drawable.GlideDrawable;
-import com.bumptech.glide.request.animation.GlideAnimation;
-import com.bumptech.glide.request.target.ViewTarget;
 import com.wipro.test.R;
 import com.wipro.test.mvp.model.Rows;
 
@@ -41,41 +35,24 @@ public class RowsAdapter extends RecyclerView.Adapter<RowsAdapter.RowsViewholder
     }
 
     @Override
-    public void onBindViewHolder(final RowsViewholder RowsViewholder, int i) {
+    public void onBindViewHolder(final RowsViewholder rowsViewholder, int i) {
         Rows rows = this.rows.get(i);
-        RowsViewholder.titleView.setText(rows.getTitle());
-        RowsViewholder.imageView.setVisibility(View.GONE);
-
+        rowsViewholder.titleView.setText(rows.getTitle());
         if (TextUtils.isEmpty(rows.getDescription())) {
-            RowsViewholder.descriptionView.setVisibility(View.GONE);
+            rowsViewholder.descriptionView.setVisibility(View.GONE);
         } else {
-            RowsViewholder.descriptionView.setVisibility(View.VISIBLE);
-            RowsViewholder.descriptionView.setText(rows.getDescription());
+            rowsViewholder.descriptionView.setVisibility(View.VISIBLE);
+            rowsViewholder.descriptionView.setText(rows.getDescription());
         }
 
-        String imageUrl = rows.getImageHref();
-        if (TextUtils.isEmpty(imageUrl)) {
-            // Need hile imageView if no Image
-            RowsViewholder.imageView.setVisibility(View.GONE);
-        } else {
-            Glide.with(RowsViewholder.imageView.getContext())
-                    .load(rows.getImageHref())
-                    .fitCenter()
-                    .into(new ViewTarget<ImageView, GlideDrawable>(RowsViewholder.imageView) {
-                        @Override
-                        public void onResourceReady(GlideDrawable resource, GlideAnimation anim) {
-                            RowsViewholder.imageView.setImageDrawable(resource.getCurrent());
-                            RowsViewholder.imageView.setVisibility(View.VISIBLE);
-                        }
+        Glide.with(rowsViewholder.imageView.getContext())
+                .load(rows.getImageHref())
+                .fitCenter()
+                .placeholder(R.drawable.place_holder_images)
+                .error(R.drawable.error_image)
+                .into(rowsViewholder.imageView);
 
-                        @Override
-                        public void onLoadFailed(Exception e, Drawable errorDrawable) {
-                            RowsViewholder.imageView.setVisibility(View.GONE);
 
-                        }
-                    });
-
-        }
     }
 
     @Override

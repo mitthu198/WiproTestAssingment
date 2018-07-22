@@ -62,7 +62,7 @@ public class RowsRetrofitClient {
                      public void onError(Throwable e) {
                          // has some exceptions
                          if (iRowsDataListener != null ) {
-                             iRowsDataListener.onError(e.getMessage());
+                             iRowsDataListener.onError(e.getLocalizedMessage());
                          }
 
                      }

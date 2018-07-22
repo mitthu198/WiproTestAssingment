@@ -1,29 +1,22 @@
 package com.wipro.test;
 
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
-
-
 import com.wipro.test.mvp.model.Rows;
 import com.wipro.test.mvp.presenters.RowsPresenter;
 import com.wipro.test.mvp.views.RowListView;
 import com.wipro.test.mvp.views.RowsAdapter;
-
-import org.w3c.dom.Text;
-
 import java.util.List;
 
 
@@ -35,14 +28,13 @@ public class MainActivity extends AppCompatActivity implements RowListView, Swip
     private ActionBar actionBar;
     private SwipeRefreshLayout swipeRefreshLayout;
 
-   // private AlertDialog errorDialog;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         actionBar = getSupportActionBar();
+        actionBar.setTitle(getString(R.string.title));
         progressBar = (ProgressBar) findViewById(R.id.progress_bar);
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
@@ -57,8 +49,12 @@ public class MainActivity extends AppCompatActivity implements RowListView, Swip
         recyclerView.setAdapter(adapter);
 
         presenter = new RowsPresenter(this);
+        if (Util.isNetworkAvailable(this)) {
+            presenter.startLoadRows();
+        } else {
+            showError(getString(R.string.network_not_available_str));
+        }
 
-        presenter.startLoadRows();
     }
 
     /**
@@ -80,7 +76,6 @@ public class MainActivity extends AppCompatActivity implements RowListView, Swip
     @Override
     public void hideLoading() {
         progressBar.setVisibility(View.GONE);
-        //swipeRefreshLayout.setVisibility(View.GONE);
         swipeRefreshLayout.setRefreshing(false);
     }
 
@@ -88,6 +83,7 @@ public class MainActivity extends AppCompatActivity implements RowListView, Swip
     public void showError(String msg) {
         progressBar.setVisibility(View.GONE);
         final Dialog dialog = new Dialog(MainActivity.this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.error_dialog);
 
         TextView title = (TextView) dialog.findViewById(R.id.error_title);
@@ -96,32 +92,13 @@ public class MainActivity extends AppCompatActivity implements RowListView, Swip
 
         title.setText(R.string.error);
         errorMessage.setText(msg);
-
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 dialog.dismiss();
             }
         });
-
         dialog.show();
-
-        /*errorDialog = new AlertDialog();
-        if (errorDialog == null) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-            builder.setTitle(R.string.error);
-            builder.setMessage(msg);
-            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    errorDialog.dismiss();
-                }
-            });
-
-            errorDialog = builder.create();
-        }
-        errorDialog.show();*/
-        Toast.makeText(MainActivity.this,msg,Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -136,9 +113,17 @@ public class MainActivity extends AppCompatActivity implements RowListView, Swip
 
     @Override
     public void onRefresh() {
-        presenter.startLoadRows();
-        swipeRefreshLayout.setVisibility(View.VISIBLE);
-        progressBar.setVisibility(View.GONE);
+        if (Util.isNetworkAvailable(this)) {
+            presenter.startLoadRows();
+            swipeRefreshLayout.setVisibility(View.VISIBLE);
+            progressBar.setVisibility(View.GONE);
+        } else {
+            showError(getString(R.string.network_not_available_str));
+            swipeRefreshLayout.setRefreshing(false);
+        }
+
     }
+
+
 
 }

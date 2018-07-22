@@ -2,4 +2,6 @@
     <string name="app_name">Wipro Test Application</string>
     <string name="error">Error Loading</string>
     <string name="button_ok">OK</string>
+    <string name="network_not_available_str">Network is not available please connect to the network.</string>
+    <string name="title">Title</string>
 </resources>

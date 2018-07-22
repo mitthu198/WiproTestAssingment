@@ -1,6 +1,7 @@
 package com.wipro.test.mvp.presenters;
 
 
+import com.wipro.test.R;
 import com.wipro.test.mvp.model.IRowsDataListener;
 import com.wipro.test.mvp.model.Rows;
 import com.wipro.test.mvp.model.RowsRetrofitClient;
@@ -18,7 +19,7 @@ import java.util.List;
  */
 public class RowsPresenter implements IRowsDataListener {
     private final static String TAG = "RowsPresenter";
-
+    private static final String HOST_ERROR ="There is some problem in server please try again later.";
     private RowListView view;
     private List<Rows> rows;
     private RowsRetrofitClient rowsRetrofitClient;
@@ -54,6 +55,7 @@ public class RowsPresenter implements IRowsDataListener {
     @Override
     public void onError(String s) {
         view.hideLoading();
-        view.showError(s);
+
+        view.showError(HOST_ERROR);
     }
 }
